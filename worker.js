@@ -144,6 +144,16 @@ const ADAPTERS = {
 
 const XERO_WAGE_RE = /wages|salaries|superannuation|super|payroll|annual leave|long service|workcover/i;
 
+/* Owner-confirmed exception (reconciliation, 14 Jul 2026): account 480.01
+   "Wages & Salaries - Associated Persons" is a related-party account, not
+   genuine staff labour. It is fully removed from BOTH Wage % and Overheads
+   (added back to Profit instead) - and Xero's "Staff Superannuation" line
+   bundles in 12% super calculated on those same wages, which is backed out
+   too. If the super guarantee rate changes, or another related-party account
+   needs the same treatment, update this block and re-confirm with the owner. */
+const XERO_ASSOC_PERSONS_LABEL_RE = /480\.01|wages\s*&\s*salaries\s*-\s*associated\s*persons/i;
+const XERO_ASSOC_PERSONS_SUPER_RATE = 0.12;
+
 /* Resolve (and cache in the token record) the connected organisation's
    tenant id. Flags the Demo Company practice org so the build can steer the
    owner to their real organisation (capability-matrix.md, sandbox risk). */
@@ -192,22 +202,36 @@ function xeroSectionTotal(section, col) {
 
 /* Keyword-match wage/super lines inside Operating Expenses for one amount
    column. Returns the matched labels too, so reconciliation can show the
-   owner exactly what was counted and get it confirmed (kpi-spec.md #5). */
+   owner exactly what was counted and get it confirmed (kpi-spec.md #5).
+   Account 480.01 (Associated Persons) is skipped entirely here - it's
+   backed out of Overheads too, in xeroParseColumn below. */
 function xeroWageLines(opexSection, col) {
   let total = 0;
   const lines = [];
+  let assocPersonsWages = 0;
   const walk = (section) => {
     for (const r of section.Rows || []) {
-      if (r.RowType === 'Row' && r.Cells && r.Cells[0] && XERO_WAGE_RE.test(r.Cells[0].Value || '')) {
-        lines.push(r.Cells[0].Value);
-        total += xeroCellNum(r.Cells[col]);
+      if (r.RowType === 'Row' && r.Cells && r.Cells[0]) {
+        const label = r.Cells[0].Value || '';
+        if (XERO_ASSOC_PERSONS_LABEL_RE.test(label)) {
+          assocPersonsWages += xeroCellNum(r.Cells[col]);
+          continue;
+        }
+        if (XERO_WAGE_RE.test(label)) {
+          lines.push(label);
+          total += xeroCellNum(r.Cells[col]);
+        }
       } else if (r.RowType === 'Section') {
         walk(r);
       }
     }
   };
   walk(opexSection);
-  return { total, lines };
+  /* Xero's Staff Superannuation line bundles in 12% super on the Associated
+     Persons wages - back that portion out too (owner-confirmed). */
+  const assocPersonsSuper = assocPersonsWages * XERO_ASSOC_PERSONS_SUPER_RATE;
+  total -= assocPersonsSuper;
+  return { total, lines, assocPersonsWages, assocPersonsSuper };
 }
 
 /* Parse one amount column out of a ProfitAndLoss report JSON into the
@@ -228,6 +252,10 @@ function xeroParseColumn(reportJson, col) {
       const w = xeroWageLines(section, col);
       wagesSuper = w.total;
       wageLines = w.lines;
+      /* Associated Persons wages + their bundled super are removed from
+         Overheads too, not just Wage % - owner wants both fully backed out
+         (added to Profit instead), never shown in either card. */
+      opex = opex - w.assocPersonsWages - w.assocPersonsSuper;
     }
     /* Any "Other Income" section is intentionally skipped - not trading income. */
   }
