@@ -108,12 +108,12 @@ const ADAPTERS = {
      connect.squareupsandbox.com.
   */
   pos: {
-    configured: false,
-    auth: null,
+    configured: true,
+    auth: 'token', /* pasted key:secret, not OAuth - Worker secrets: POS_API_KEY, POS_API_SECRET, POS_SUBDOMAIN */
     oauth: {},
-    async status(env, h) { return { connected: false }; },
-    async fetchRange(env, h, q) { throw new NotConfigured('pos'); },
-    async fetchMonthly(env, h, q) { throw new NotConfigured('pos'); }
+    async status(env, h) { return revelStatus(env, h); },
+    async fetchRange(env, h, q) { return revelFetchRange(env, h, q); },
+    async fetchMonthly(env, h, q) { return revelFetchMonthly(env, h, q); }
   },
 
   /* >>> ADAPTER 3: ROSTERING (optional - only if the owner has one)
@@ -304,6 +304,87 @@ async function xeroFetchMonthly(env, h, q) {
     out.overheads.push(v.overheads);
   }
   return out;
+}
+
+/* ============================================================================
+   Revel Systems POS adapter (legacy per-venue REST API - verified against
+   developer.revelsystems.com July 2026: base URL
+   https://{subdomain}.revelup.com/resources/, auth via an API-AUTHENTICATION
+   header of "key:secret", Tastypie-style filtering with created_date__gte /
+   created_date__lt and a meta.total_count on every list response so we never
+   have to pull full order objects just to count them.
+   ONE number only, per kpi-spec.md: completed transactions, no $ ever.
+   NOTE (verify at reconciliation): Revel's Order resource doesn't clearly
+   expose a void/refund flag in the public docs - `closed=true` is used as
+   the "completed" proxy. If the count doesn't match the owner's Revel
+   reporting screen, this is the first thing to check (work the diagnosis
+   list in playbook.md).
+============================================================================ */
+
+function revelBase(env) { return 'https://' + env.POS_SUBDOMAIN + '.revelup.com/resources/'; }
+function revelHeaders(env) {
+  return { 'API-AUTHENTICATION': env.POS_API_KEY + ':' + env.POS_API_SECRET, 'Content-Type': 'application/json' };
+}
+
+async function revelStatus(env, h) {
+  if (!env.POS_API_KEY || !env.POS_API_SECRET || !env.POS_SUBDOMAIN) {
+    const e = new Error('missing Revel credentials'); e.status = 401; throw e;
+  }
+  const url = revelBase(env) + 'Establishment/?format=json&limit=1';
+  const data = await h.fetchJson(url, { headers: revelHeaders(env) }, { auth: false });
+  const est = (data.objects && data.objects[0]) || {};
+  return { connected: true, org: est.name || env.POS_SUBDOMAIN, sandbox: false, lastSync: null };
+}
+
+/* Find the UTC instant whose wall-clock time in `tz` is dateStr at `hour`:00:00.
+   Iterates twice against Intl's own offset for that instant, which converges
+   even across a DST transition. Used so the trading-day rollover honours the
+   venue's actual timezone, not just a fixed UTC offset. */
+function revelZonedToUtcISO(dateStr, hour, tz) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const target = Date.UTC(y, m - 1, d, hour, 0, 0); /* fixed: the wall-clock we want, read as if UTC */
+  let guess = target;
+  for (let i = 0; i < 2; i++) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).formatToParts(new Date(guess));
+    const map = {}; parts.forEach((p) => { map[p.type] = p.value; });
+    const hh = map.hour === '24' ? 0 : Number(map.hour);
+    const readingAsUTC = Date.UTC(Number(map.year), Number(map.month) - 1, Number(map.day), hh, Number(map.minute), Number(map.second));
+    const offset = readingAsUTC - guess; /* tz's current offset from UTC, at this instant */
+    guess = target - offset;
+  }
+  return new Date(guess).toISOString();
+}
+
+async function revelCountRange(env, h, fromDateStr, toDateStrExclusive, tz, rollover) {
+  const startISO = revelZonedToUtcISO(fromDateStr, rollover || 0, tz);
+  const endISO = revelZonedToUtcISO(toDateStrExclusive, rollover || 0, tz);
+  const url = revelBase(env) + 'Order/?format=json&limit=1&closed=true'
+    + '&created_date__gte=' + encodeURIComponent(startISO)
+    + '&created_date__lt=' + encodeURIComponent(endISO);
+  const data = await h.fetchJson(url, { headers: revelHeaders(env) }, { auth: false });
+  if (data && data.meta && typeof data.meta.total_count === 'number') return data.meta.total_count;
+  return Array.isArray(data && data.objects) ? data.objects.length : 0;
+}
+
+async function revelFetchRange(env, h, q) {
+  const [y, m, d] = q.to.split('-').map(Number);
+  const toExclusive = new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+  const count = await revelCountRange(env, h, q.from, toExclusive, q.tz, q.rollover);
+  return { count };
+}
+
+async function revelFetchMonthly(env, h, q) {
+  const months = monthList(q.fromMonth, q.toMonth);
+  const counts = await Promise.all(months.map((mo) => {
+    const [y, m] = mo.split('-').map(Number);
+    const from = mo + '-01';
+    const toExclusive = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10); /* 1st of next month */
+    return revelCountRange(env, h, from, toExclusive, q.tz, q.rollover).catch(() => null);
+  }));
+  return { months, count: counts };
 }
 
 /* ============================================================================
