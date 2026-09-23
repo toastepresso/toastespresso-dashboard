@@ -1,11 +1,9 @@
-
-Worker · JS
 /* ============================================================================
    Venue dashboard - Worker shell (ships in the FC Member Dashboard Kit)
- 
+
    You are the AI running this build. This file is YOURS to finish; the owner
    never sees it. The shell already does the hard plumbing:
- 
+
      - serves the dashboard page
      - a metrics API with a fixed contract the page already understands
      - an OAuth2 begin/callback flow with token storage
@@ -16,11 +14,11 @@ Worker · JS
      - the no-API rungs built in: POST /api/ingest (file/export data in),
        an email() handler stub for emailed reports, a scheduled() cron hook,
        and a KV day-store the export-fed adapters read from
- 
+
    What you fill in: the three ADAPTERS (accounting / pos / rostering), each
    marked with  >>> ADAPTER ...  blocks. Wire them against the provider's
    CURRENT documentation, per capability-matrix.md and playbook.md.
- 
+
    Rules that bind every adapter (kpi-spec.md is the law):
      - accounting supplies EVERY money figure, always ex GST/sales tax
      - pos supplies ONE number: completed transaction count (no voids/refunds)
@@ -28,12 +26,12 @@ Worker · JS
      - read-only scopes/permissions everywhere
      - secrets ONLY via Worker secrets (wrangler secret put NAME) - never in
        this file, never in the repo, never echoed to the owner
- 
+
    Bindings expected (wrangler.toml): TOKENS (KV). Secrets: see each adapter.
 ============================================================================ */
- 
+
 import dashboardHtml from './dashboard.html';
- 
+
 /* ----------------------------------------------------------------------------
    Provider adapters - THE PART YOU BUILD.
    Flip `configured: true` per source as you wire it. Until then the
@@ -59,7 +57,7 @@ import dashboardHtml from './dashboard.html';
    with Email Routing pointed at this Worker). Ingest auth: the INGEST_TOKEN
    secret; if the owner uploads by hand, that same value is their upload code. */
 const ADAPTERS = {
- 
+
   /* >>> ADAPTER 1: ACCOUNTING (connect this FIRST - it feeds most of the board)
      Contract:
        auth: 'oauth' with the oauth{} block filled, or 'token' for a pasted key
@@ -95,7 +93,7 @@ const ADAPTERS = {
     async fetchRange(env, h, q) { return xeroFetchRange(env, h, q); },
     async fetchMonthly(env, h, q) { return xeroFetchMonthly(env, h, q); }
   },
- 
+
   /* >>> ADAPTER 2: POS
      Contract:
        status(env, h)        -> { connected, org, sandbox, lastSync }
@@ -117,7 +115,7 @@ const ADAPTERS = {
     async fetchRange(env, h, q) { return revelFetchRange(env, h, q); },
     async fetchMonthly(env, h, q) { return revelFetchMonthly(env, h, q); }
   },
- 
+
   /* >>> ADAPTER 3: ROSTERING (optional - only if the owner has one)
      Contract:
        status(env, h)        -> { connected, org, sandbox, lastSync }
@@ -136,16 +134,16 @@ const ADAPTERS = {
     async fetchMonthly(env, h, q) { return deputyFetchMonthly(env, h, q); }
   }
 };
- 
+
 /* ============================================================================
    Xero accounting adapter (wired per capability-matrix.md, verified against
    Xero's docs June 2026). Every money figure on the board comes from here,
    ex GST/sales tax (kpi-spec.md). Wage/super detection is a PROPOSAL that
    gets confirmed with the owner during reconciliation - see kpi-spec.md #5.
 ============================================================================ */
- 
+
 const XERO_WAGE_RE = /wages|salaries|superannuation|super|payroll|annual leave|long service|workcover/i;
- 
+
 /* Owner-confirmed exception (reconciliation, 14 Jul 2026): account 480.01
    "Wages & Salaries - Associated Persons" is a related-party account, not
    genuine staff labour. It is fully removed from BOTH Wage % and Overheads
@@ -155,7 +153,7 @@ const XERO_WAGE_RE = /wages|salaries|superannuation|super|payroll|annual leave|l
    needs the same treatment, update this block and re-confirm with the owner. */
 const XERO_ASSOC_PERSONS_LABEL_RE = /480\.01|wages\s*&\s*salaries\s*-\s*associated\s*persons/i;
 const XERO_ASSOC_PERSONS_SUPER_RATE = 0.12;
- 
+
 /* Resolve (and cache in the token record) the connected organisation's
    tenant id. Flags the Demo Company practice org so the build can steer the
    owner to their real organisation (capability-matrix.md, sandbox risk). */
@@ -176,18 +174,18 @@ async function xeroTenantId(env, h) {
   }
   return { id: tenant.tenantId, name: tenant.tenantName, sandbox: /demo company/i.test(tenant.tenantName || '') };
 }
- 
+
 async function xeroStatus(env, h) {
   const t = await xeroTenantId(env, h);
   return { connected: true, org: t.name, sandbox: t.sandbox, lastSync: null };
 }
- 
+
 function xeroCellNum(cell) {
   if (!cell || cell.Value === undefined || cell.Value === null || cell.Value === '') return 0;
   const n = parseFloat(String(cell.Value).replace(/,/g, ''));
   return isNaN(n) ? 0 : n;
 }
- 
+
 /* Sum one amount column (col; 0 is the row label) for a Section, preferring
    its own SummaryRow total over summing child rows so nested sub-groups are
    never double-counted. Recurses into nested Sections. */
@@ -201,7 +199,7 @@ function xeroSectionTotal(section, col) {
   }
   return total;
 }
- 
+
 /* Keyword-match wage/super lines inside Operating Expenses for one amount
    column. Returns the matched labels too, so reconciliation can show the
    owner exactly what was counted and get it confirmed (kpi-spec.md #5).
@@ -235,7 +233,7 @@ function xeroWageLines(opexSection, col) {
   total -= assocPersonsSuper;
   return { total, lines, assocPersonsWages, assocPersonsSuper };
 }
- 
+
 /* Parse one amount column out of a ProfitAndLoss report JSON into the
    dashboard's four figures. Revenue is trading income only - a section
    titled "Other Income" is never matched here (kpi-spec.md #1, #6). */
@@ -264,7 +262,7 @@ function xeroParseColumn(reportJson, col) {
   const overheads = (opex != null) ? (opex - wagesSuper) : null;
   return { revenue, cogs, wagesSuper, overheads, wageLines };
 }
- 
+
 async function xeroFetchRange(env, h, q) {
   const t = await xeroTenantId(env, h);
   const url = 'https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?' + new URLSearchParams({ fromDate: q.from, toDate: q.to }).toString();
@@ -272,7 +270,7 @@ async function xeroFetchRange(env, h, q) {
   const parsed = xeroParseColumn(report, 1);
   return { revenue: parsed.revenue, cogs: parsed.cogs, wagesSuper: parsed.wagesSuper, overheads: parsed.overheads };
 }
- 
+
 /* Monthly trend: Xero's `periods` param is capped at 12, so a run longer
    than 12 months is fetched in ≤12-period chunks and stitched
    (capability-matrix.md). Each call returns `periods+1` monthly columns
@@ -307,7 +305,7 @@ async function xeroFetchMonthly(env, h, q) {
   }
   return out;
 }
- 
+
 /* ============================================================================
    Revel Systems POS adapter (legacy per-venue REST API - verified against
    developer.revelsystems.com July 2026: base URL
@@ -322,12 +320,12 @@ async function xeroFetchMonthly(env, h, q) {
    reporting screen, this is the first thing to check (work the diagnosis
    list in playbook.md).
 ============================================================================ */
- 
+
 function revelBase(env) { return 'https://' + env.POS_SUBDOMAIN + '.revelup.com/resources/'; }
 function revelHeaders(env) {
   return { 'API-AUTHENTICATION': env.POS_API_KEY + ':' + env.POS_API_SECRET, 'Content-Type': 'application/json' };
 }
- 
+
 async function revelStatus(env, h) {
   if (!env.POS_API_KEY || !env.POS_API_SECRET || !env.POS_SUBDOMAIN) {
     const e = new Error('missing Revel credentials'); e.status = 401; throw e;
@@ -341,7 +339,7 @@ async function revelStatus(env, h) {
   await h.fetchJson(url, { headers: revelHeaders(env) }, { auth: false });
   return { connected: true, org: env.POS_SUBDOMAIN, sandbox: false, lastSync: null };
 }
- 
+
 /* Find the UTC instant whose wall-clock time in `tz` is dateStr at `hour`:00:00.
    Iterates twice against Intl's own offset for that instant, which converges
    even across a DST transition. Used so the trading-day rollover honours the
@@ -363,7 +361,7 @@ function revelZonedToUtcISO(dateStr, hour, tz) {
   }
   return new Date(guess).toISOString();
 }
- 
+
 async function revelCountRange(env, h, fromDateStr, toDateStrExclusive, tz, rollover) {
   const startISO = revelZonedToUtcISO(fromDateStr, rollover || 0, tz);
   const endISO = revelZonedToUtcISO(toDateStrExclusive, rollover || 0, tz);
@@ -374,16 +372,16 @@ async function revelCountRange(env, h, fromDateStr, toDateStrExclusive, tz, roll
   if (data && data.meta && typeof data.meta.total_count === 'number') return data.meta.total_count;
   return Array.isArray(data && data.objects) ? data.objects.length : 0;
 }
- 
+
 async function revelFetchRange(env, h, q) {
   const [y, m, d] = q.to.split('-').map(Number);
   const toExclusive = new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
   const count = await revelCountRange(env, h, q.from, toExclusive, q.tz, q.rollover);
   return { count };
 }
- 
+
 function sleep(ms) { return new Promise((res) => setTimeout(res, ms)); }
- 
+
 /* Sequential, not Promise.all: firing 24 months of requests at once was
    tripping Revel's rate limit on every single dashboard load. A small gap
    between calls keeps this well under any reasonable burst limit - the
@@ -404,7 +402,7 @@ async function revelFetchMonthly(env, h, q) {
   }
   return { months, count: counts };
 }
- 
+
 /* ============================================================================
    Deputy rostering adapter (permanent token, verified against
    developer.deputy.com July 2026). Resource API: POST-only queries, a
@@ -415,7 +413,7 @@ async function revelFetchMonthly(env, h, q) {
    pull could theoretically hit that on a large team; fine for a single
    café, worth revisiting if this ever undercounts during reconciliation.
 ============================================================================ */
- 
+
 function deputyBase(env) { return 'https://' + env.ROSTERING_INSTALL + '.' + env.ROSTERING_GEO + '.deputy.com/api/v1/resource/'; }
 function deputyHeaders(env) {
   return { 'Authorization': 'Bearer ' + env.ROSTERING_API_TOKEN, 'Content-Type': 'application/json' };
@@ -424,7 +422,7 @@ function deputyAddDays(dateStr, n) {
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
 }
- 
+
 async function deputyStatus(env, h) {
   if (!env.ROSTERING_API_TOKEN || !env.ROSTERING_INSTALL || !env.ROSTERING_GEO) {
     const e = new Error('missing Deputy credentials'); e.status = 401; throw e;
@@ -437,7 +435,7 @@ async function deputyStatus(env, h) {
   const name = (data && (data.DisplayName || (data.Company && data.Company.CompanyName))) || env.ROSTERING_INSTALL;
   return { connected: true, org: name, sandbox: false, lastSync: null };
 }
- 
+
 /* Sums the `Cost` field across Timesheets whose Date falls in
    [fromDateStr, toDateStr] inclusive (gt the day before / lt the day
    after, matching Deputy's documented gt/lt filter style). */
@@ -455,12 +453,12 @@ async function deputyCostRange(env, h, fromDateStr, toDateStr) {
   if (Array.isArray(rows)) { for (const r of rows) total += Number(r.Cost) || 0; }
   return total;
 }
- 
+
 async function deputyFetchRange(env, h, q) {
   const cost = await deputyCostRange(env, h, q.from, q.to);
   return { cost };
 }
- 
+
 async function deputyFetchMonthly(env, h, q) {
   const months = monthList(q.fromMonth, q.toMonth);
   const costs = await Promise.all(months.map((mo) => {
@@ -471,15 +469,15 @@ async function deputyFetchMonthly(env, h, q) {
   }));
   return { months, cost: costs };
 }
- 
+
 /* ============================================================================
    Everything below is the shell. You should rarely need to edit it.
 ============================================================================ */
- 
+
 class NotConfigured extends Error {
   constructor(source) { super('not configured: ' + source); this.source = source; }
 }
- 
+
 const PLAIN_ERRORS = {
   401: 'This connection needs reconnecting. Click Reconnect and log in again.',
   403: 'This connection is missing a permission it needs. Your AI will sort out the access.',
@@ -489,9 +487,9 @@ const PLAIN_ERRORS = {
 function plainError(status) {
   return PLAIN_ERRORS[status] || ('Something went wrong talking to this tool (code ' + status + '). Try refresh; if it persists, tell your AI.');
 }
- 
+
 /* ---------------- Token store (KV) with refresh built in ---------------- */
- 
+
 async function getTokens(env, source) {
   const raw = await env.TOKENS.get('tokens:' + source);
   return raw ? JSON.parse(raw) : null;
@@ -508,7 +506,7 @@ async function noteSync(env, source) {
 async function lastSync(env, source) {
   return await env.TOKENS.get('lastSync:' + source);
 }
- 
+
 /* Build the POST to an OAuth token endpoint, honouring the adapter's client-auth
    method. tokenAuth:'basic' -> client id+secret in an HTTP Basic Authorization
    header, NOT in the body (Xero and most OpenID providers expect this); 'post'
@@ -526,7 +524,7 @@ function tokenRequestInit(cfg, params, env) {
   }
   return { method: 'POST', headers: headers, body: body.toString() };
 }
- 
+
 /* Returns a valid access token for an OAuth source, refreshing (and
    persisting the ROTATED refresh token) when needed. */
 async function getValidAccessToken(env, source) {
@@ -535,7 +533,7 @@ async function getValidAccessToken(env, source) {
   if (!tokens || !tokens.access_token) { const e = new Error('no tokens'); e.status = 401; throw e; }
   const skewMs = 60 * 1000;
   if (!tokens.expires_at || Date.now() < tokens.expires_at - skewMs) return tokens.access_token;
- 
+
   /* refresh */
   const cfg = adapter.oauth || {};
   if (!tokens.refresh_token || !cfg.tokenUrl) { const e = new Error('cannot refresh'); e.status = 401; throw e; }
@@ -558,7 +556,7 @@ async function getValidAccessToken(env, source) {
   await saveTokens(env, source, updated);
   return updated.access_token;
 }
- 
+
 /* Helpers handed to every adapter call */
 function makeHelpers(env, source) {
   return {
@@ -590,15 +588,15 @@ function makeHelpers(env, source) {
     }
   };
 }
- 
+
 /* ---------------- OAuth begin + callback (generic, per-source) ---------- */
- 
+
 function randomState() {
   const a = new Uint8Array(16);
   crypto.getRandomValues(a);
   return Array.from(a).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
- 
+
 /* ---------------- Owner login: one passcode + a signed session cookie ----
    The owner sets the dashboard password on the dashboard's own FIRST-RUN screen;
    it is stored PBKDF2-hashed in KV (sys:passcode_hash) - no Cloudflare Variables
@@ -696,7 +694,7 @@ async function apiLogin(env, request) {
   const token = await makeSession(env);
   return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Set-Cookie': 'vd_session=' + encodeURIComponent(token) + '; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=' + SESSION_TTL } });
 }
- 
+
 /* First-run (or authenticated change): set the dashboard password. Allowed only
    when none is set yet, OR when the caller already holds a valid session - so a
    stranger can never overwrite an existing password. Stored PBKDF2-hashed in KV. */
@@ -739,7 +737,7 @@ function loginPage() {
     + '.catch(function(){e.textContent="Something went wrong. Try again.";});};'
     + '</script></body></html>';
 }
- 
+
 function setupPage() {
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Set your password</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Khand:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">'
@@ -768,7 +766,7 @@ function setupPage() {
     + '.catch(function(){e.textContent="Something went wrong. Try again.";});};'
     + '</script></body></html>';
 }
- 
+
 async function authStart(env, source, url) {
   const adapter = ADAPTERS[source];
   if (!adapter || adapter.auth !== 'oauth' || !adapter.oauth.authorizeUrl) {
@@ -787,7 +785,7 @@ async function authStart(env, source, url) {
   });
   return Response.redirect(cfg.authorizeUrl + '?' + p.toString(), 302);
 }
- 
+
 async function authCallback(env, source, url) {
   const adapter = ADAPTERS[source];
   const cfg = (adapter && adapter.oauth) || {};
@@ -818,9 +816,9 @@ async function authCallback(env, source, url) {
   /* After token storage, adapters' status() should resolve org name etc. */
   return Response.redirect(url.origin + '/', 302);
 }
- 
+
 /* ---------------- No-API ingest: KV day-store + endpoint ---------------- */
- 
+
 /* Day rows live at data:<source>:<YYYY-MM-DD> as JSON objects of numeric
    fields. Same-day re-uploads overwrite (idempotent; re-ingesting a corrected
    export is safe and expected). */
@@ -839,7 +837,7 @@ async function saveIngestedRows(env, source, rows) {
   }
   return saved;
 }
- 
+
 function eachDate(from, to, cap) {
   const out = [];
   const d = new Date(from + 'T12:00:00Z');
@@ -850,7 +848,7 @@ function eachDate(from, to, cap) {
   }
   return out;
 }
- 
+
 /* Sum stored day rows across a range. Returns { sums, daysWithData, lastDate }. */
 async function readIngested(env, source, from, to) {
   const sums = {};
@@ -868,7 +866,7 @@ async function readIngested(env, source, from, to) {
   }
   return { sums, daysWithData, lastDate };
 }
- 
+
 async function monthlyIngested(env, source, fromMonth, toMonth) {
   const months = monthList(fromMonth, toMonth);
   const out = { months, byMonth: [] };
@@ -880,7 +878,7 @@ async function monthlyIngested(env, source, fromMonth, toMonth) {
   }
   return out;
 }
- 
+
 /* POST /api/ingest?source=pos|accounting|rostering
    Authorization: Bearer <INGEST_TOKEN>. Body: the exported file's text.
    The source's adapter.parseExport() turns it into day rows. */
@@ -909,9 +907,9 @@ async function apiIngest(env, request, url) {
     return json({ error: 'parse failed', plain: 'That file couldn\u2019t be read. Check it\u2019s the right report, or show it to your AI.' }, 422);
   }
 }
- 
+
 /* ---------------- Metrics API ---------------- */
- 
+
 function parseRange(s) {
   if (!s) return null;
   const m = /^(\d{4}-\d{2}-\d{2}):(\d{4}-\d{2}-\d{2})$/.exec(s);
@@ -922,7 +920,7 @@ function parseMonthRange(s) {
   const m = /^(\d{4}-\d{2}):(\d{4}-\d{2})$/.exec(s);
   return m ? { fromMonth: m[1], toMonth: m[2] } : null;
 }
- 
+
 async function sourceStatus(env, source) {
   const adapter = ADAPTERS[source];
   if (!adapter || !adapter.configured) return { configured: false };
@@ -950,7 +948,7 @@ async function sourceStatus(env, source) {
     };
   }
 }
- 
+
 async function fetchSlot(env, q) {
   /* One period slot: pull each configured source; null where unavailable. */
   const out = {};
@@ -967,9 +965,9 @@ async function fetchSlot(env, q) {
   }
   return out;
 }
- 
+
 const METRICS_CACHE_TTL = 120; /* seconds: brief cache for live provider data */
- 
+
 async function apiMetrics(env, url) {
   const cur = parseRange(url.searchParams.get('cur'));
   if (!cur) return json({ error: 'bad cur range' }, 400);
@@ -978,14 +976,14 @@ async function apiMetrics(env, url) {
   const trend = parseMonthRange(url.searchParams.get('trend'));
   const tz = url.searchParams.get('tz') || 'Australia/Sydney';
   const rollover = Math.max(0, Math.min(6, parseInt(url.searchParams.get('rollover') || '0', 10) || 0));
- 
+
   const base = { tz, rollover };
   const [sAcc, sPos, sRos] = await Promise.all([
     sourceStatus(env, 'accounting'),
     sourceStatus(env, 'pos'),
     sourceStatus(env, 'rostering')
   ]);
- 
+
   /* The provider calls (periods + trend) are the expensive part and the only
      thing that brushes provider rate limits on quick reopens/refreshes. Cache
      them briefly in KV, keyed by the requested ranges; source status stays live.
@@ -1007,7 +1005,7 @@ async function apiMetrics(env, url) {
     periods.cur = await fetchSlot(env, { ...base, ...cur });
     periods.prev = prev ? await fetchSlot(env, { ...base, ...prev }) : null;
     periods.yoy = yoy ? await fetchSlot(env, { ...base, ...yoy }) : null;
- 
+
     let trendOut = null;
     if (trend) {
       trendOut = { months: monthList(trend.fromMonth, trend.toMonth) };
@@ -1026,7 +1024,7 @@ async function apiMetrics(env, url) {
       try { await env.TOKENS.put(cacheKey, JSON.stringify(data), { expirationTtl: METRICS_CACHE_TTL }); } catch (e) {}
     }
   }
- 
+
   return json({
     generatedAt: data.generatedAt,
     protected: true,
@@ -1035,7 +1033,7 @@ async function apiMetrics(env, url) {
     trend: data.trend
   });
 }
- 
+
 function monthList(fromMonth, toMonth) {
   const out = [];
   let [y, m] = fromMonth.split('-').map(Number);
@@ -1059,29 +1057,29 @@ function alignSeries(months, series) {
   });
   return out;
 }
- 
+
 /* ---------------- Router ---------------- */
- 
+
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
   });
 }
- 
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
- 
+
     if (path === '/favicon.ico') return new Response(null, { status: 204 });
     if (path === '/api/login' && request.method === 'POST') return apiLogin(env, request);
     if (path === '/api/setup' && request.method === 'POST') return apiSetup(env, request);
     if (path === '/api/logout' && request.method === 'POST') return apiLogout();
     if (path === '/api/ingest' && request.method === 'POST') return apiIngest(env, request, url);
- 
+
     const loggedIn = await isLoggedIn(request, env);
- 
+
     if (path === '/' || path === '/index.html') {
       if (loggedIn) return htmlResponse(dashboardHtml);
       return htmlResponse((await passcodeSet(env)) ? loginPage() : setupPage());
@@ -1106,7 +1104,7 @@ export default {
     }
     return new Response('Not found', { status: 404 });
   },
- 
+
   /* Cron rung: uncomment [triggers] in wrangler.toml and give any adapter a
      scheduledPull() to fetch its tool's own export on a schedule. */
   async scheduled(event, env, ctx) {
@@ -1122,7 +1120,7 @@ export default {
       }
     }
   },
- 
+
   /* Email rung (Path B): the tool's own report scheduler emails its export;
      the owner's domain on their Cloudflare routes that address here (Email
      Routing -> this Worker). Complete when this rung is chosen:
@@ -1137,5 +1135,3 @@ export default {
   }
 };
 // EOF worker.js
- 
-
