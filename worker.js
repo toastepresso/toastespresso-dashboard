@@ -126,12 +126,12 @@ const ADAPTERS = {
      Example (Deputy): pasted permanent token (secret ROSTERING_API_TOKEN).
   */
   rostering: {
-    configured: false,
-    auth: null,
+    configured: true,
+    auth: 'token', /* permanent token - Worker secrets: ROSTERING_API_TOKEN, ROSTERING_INSTALL, ROSTERING_GEO */
     oauth: {},
-    async status(env, h) { return { connected: false }; },
-    async fetchRange(env, h, q) { throw new NotConfigured('rostering'); },
-    async fetchMonthly(env, h, q) { return { months: [], cost: [] }; }
+    async status(env, h) { return deputyStatus(env, h); },
+    async fetchRange(env, h, q) { return deputyFetchRange(env, h, q); },
+    async fetchMonthly(env, h, q) { return deputyFetchMonthly(env, h, q); }
   }
 };
 
@@ -389,6 +389,70 @@ async function revelFetchMonthly(env, h, q) {
     return revelCountRange(env, h, from, toExclusive, q.tz, q.rollover).catch(() => null);
   }));
   return { months, count: counts };
+}
+
+/* ============================================================================
+   Deputy rostering adapter (permanent token, verified against
+   developer.deputy.com July 2026). Resource API: POST-only queries, a
+   Timesheet's own `Cost` field is the rostered/actual labour cost - no need
+   for a separate TimesheetPayReturn join. Feeds PROJECTED Wage % only;
+   never touches the actual Wage % (that's Xero, kpi-spec.md #5).
+   NOTE: the API caps responses at 500 rows - a very busy multi-week trend
+   pull could theoretically hit that on a large team; fine for a single
+   café, worth revisiting if this ever undercounts during reconciliation.
+============================================================================ */
+
+function deputyBase(env) { return 'https://' + env.ROSTERING_INSTALL + '.' + env.ROSTERING_GEO + '.deputy.com/api/v1/resource/'; }
+function deputyHeaders(env) {
+  return { 'Authorization': 'Bearer ' + env.ROSTERING_API_TOKEN, 'Content-Type': 'application/json' };
+}
+function deputyAddDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+}
+
+async function deputyStatus(env, h) {
+  if (!env.ROSTERING_API_TOKEN || !env.ROSTERING_INSTALL || !env.ROSTERING_GEO) {
+    const e = new Error('missing Deputy credentials'); e.status = 401; throw e;
+  }
+  const url = deputyBase(env) + 'Timesheet/QUERY';
+  const body = JSON.stringify({ search: { s1: { field: 'Id', data: 0, type: 'gt' } }, max: 1 });
+  await h.fetchJson(url, { method: 'POST', headers: deputyHeaders(env), body }, { auth: false });
+  return { connected: true, org: env.ROSTERING_INSTALL, sandbox: false, lastSync: null };
+}
+
+/* Sums the `Cost` field across Timesheets whose Date falls in
+   [fromDateStr, toDateStr] inclusive (gt the day before / lt the day
+   after, matching Deputy's documented gt/lt filter style). */
+async function deputyCostRange(env, h, fromDateStr, toDateStr) {
+  const url = deputyBase(env) + 'Timesheet/QUERY';
+  const body = JSON.stringify({
+    search: {
+      s1: { field: 'Date', data: deputyAddDays(fromDateStr, -1), type: 'gt' },
+      s2: { field: 'Date', data: deputyAddDays(toDateStr, 1), type: 'lt' }
+    },
+    max: 500
+  });
+  const rows = await h.fetchJson(url, { method: 'POST', headers: deputyHeaders(env), body }, { auth: false });
+  let total = 0;
+  if (Array.isArray(rows)) { for (const r of rows) total += Number(r.Cost) || 0; }
+  return total;
+}
+
+async function deputyFetchRange(env, h, q) {
+  const cost = await deputyCostRange(env, h, q.from, q.to);
+  return { cost };
+}
+
+async function deputyFetchMonthly(env, h, q) {
+  const months = monthList(q.fromMonth, q.toMonth);
+  const costs = await Promise.all(months.map((mo) => {
+    const [y, m] = mo.split('-').map(Number);
+    const from = mo + '-01';
+    const to = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10); /* last day of month */
+    return deputyCostRange(env, h, from, to).catch(() => null);
+  }));
+  return { months, cost: costs };
 }
 
 /* ============================================================================
