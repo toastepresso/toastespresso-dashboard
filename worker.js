@@ -330,10 +330,14 @@ async function revelStatus(env, h) {
   if (!env.POS_API_KEY || !env.POS_API_SECRET || !env.POS_SUBDOMAIN) {
     const e = new Error('missing Revel credentials'); e.status = 401; throw e;
   }
-  const url = revelBase(env) + 'Establishment/?format=json&limit=1';
-  const data = await h.fetchJson(url, { headers: revelHeaders(env) }, { auth: false });
-  const est = (data.objects && data.objects[0]) || {};
-  return { connected: true, org: est.name || env.POS_SUBDOMAIN, sandbox: false, lastSync: null };
+  /* Mirror the EXACT query shape revelCountRange already succeeds with
+     (closed=true + a created_date__gte filter) rather than a bare list
+     call - some accounts 404 on an unfiltered Order list even though the
+     filtered query (what the real counts use) works fine. */
+  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  const url = revelBase(env) + 'Order/?format=json&limit=1&closed=true&created_date__gte=' + encodeURIComponent(since);
+  await h.fetchJson(url, { headers: revelHeaders(env) }, { auth: false });
+  return { connected: true, org: env.POS_SUBDOMAIN, sandbox: false, lastSync: null };
 }
 
 /* Find the UTC instant whose wall-clock time in `tz` is dateStr at `hour`:00:00.
