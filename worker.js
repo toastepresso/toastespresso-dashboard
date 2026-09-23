@@ -415,10 +415,13 @@ async function deputyStatus(env, h) {
   if (!env.ROSTERING_API_TOKEN || !env.ROSTERING_INSTALL || !env.ROSTERING_GEO) {
     const e = new Error('missing Deputy credentials'); e.status = 401; throw e;
   }
-  const url = deputyBase(env) + 'Timesheet/QUERY';
-  const body = JSON.stringify({ search: { s1: { field: 'Id', data: 0, type: 'gt' } }, max: 1 });
-  await h.fetchJson(url, { method: 'POST', headers: deputyHeaders(env), body }, { auth: false });
-  return { connected: true, org: env.ROSTERING_INSTALL, sandbox: false, lastSync: null };
+  /* Deputy's own documented way to validate a token: GET /api/v1/me (the
+     "who am I" endpoint), rather than a Resource API POST query - simpler
+     and matches their own recommended check exactly. */
+  const url = 'https://' + env.ROSTERING_INSTALL + '.' + env.ROSTERING_GEO + '.deputy.com/api/v1/me';
+  const data = await h.fetchJson(url, { headers: deputyHeaders(env) }, { auth: false });
+  const name = (data && (data.DisplayName || (data.Company && data.Company.CompanyName))) || env.ROSTERING_INSTALL;
+  return { connected: true, org: name, sandbox: false, lastSync: null };
 }
 
 /* Sums the `Cost` field across Timesheets whose Date falls in
