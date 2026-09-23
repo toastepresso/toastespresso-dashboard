@@ -1,3 +1,5 @@
+
+Dashboard · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,13 +66,13 @@ body {
     radial-gradient(ellipse at 100% 100%, rgba(242,169,0,0.04) 0%, transparent 50%);
 }
 #app { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
-
+ 
 /* Top bar: the owner's name for the venue, no other identity */
 .topbar { display: flex; align-items: baseline; gap: 1rem; padding: 2rem 0 0.4rem; flex-wrap: wrap; }
 .venue-name { font-family: 'Khand', sans-serif; font-size: 40px; font-weight: 700; color: var(--black); line-height: 1; letter-spacing: -0.01em; }
 .topbar-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
 .top-rule { width: 48px; height: 3px; background: var(--accent); border-radius: 2px; margin: 0.4rem 0 1rem; }
-
+ 
 /* Nav tabs */
 .nav { display: flex; gap: 6px; margin-bottom: 1.1rem; flex-wrap: wrap; }
 .nav-tab {
@@ -81,14 +83,14 @@ body {
 .nav-tab:hover { background: var(--cream2); }
 .nav-tab.active { background: var(--black); color: #fff; border-color: var(--black); }
 .nav-tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--c-coral); margin-left: 7px; vertical-align: 1px; }
-
+ 
 /* Banners */
 .banner { border-radius: 12px; padding: 0.85rem 1.1rem; font-size: 14px; line-height: 1.55; margin-bottom: 0.9rem; border: 1px solid transparent; }
 .banner b { font-weight: 500; }
 .banner-amber { background: var(--c-amber-bg); border-color: var(--c-amber-border); color: var(--c-amber-text, #5a3c00); }
 .banner-coral { background: var(--c-coral-bg); border-color: var(--c-coral-border); color: #6b2510; }
 .banner-link { color: inherit; font-weight: 500; text-decoration: underline; cursor: pointer; }
-
+ 
 /* Period bar */
 .period-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0.4rem; }
 .period-label { font-family: 'Khand', sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-right: 2px; }
@@ -114,16 +116,16 @@ body {
   border-radius: 9px; border: 1px solid var(--border-med); background: transparent; color: var(--text); cursor: pointer;
 }
 .btn-plain:hover { background: var(--cream2); }
-
+ 
 /* Freshness row */
 .fresh-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); margin: 0.2rem 0 1.1rem; flex-wrap: wrap; }
 .fresh-row .spin { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(242,169,0,0.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; vertical-align: -2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
+ 
 /* Period heading */
 .period-heading { font-family: 'Khand', sans-serif; font-size: 21px; font-weight: 600; color: var(--black); margin: 0 0 0.9rem; }
 .period-heading span { color: var(--muted); font-weight: 500; }
-
+ 
 /* Metric cards */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
 .mcard {
@@ -153,11 +155,11 @@ body {
 .m-alert { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--c-amber); font-weight: 500; margin: 0 0 0.5rem; }
 .m-decision { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.55; margin-top: 0.45rem; }
 .m-decision b { color: var(--text); font-weight: 500; }
-
+ 
 /* Sections shared */
 .screen-title { font-family: 'Khand', sans-serif; font-size: 26px; font-weight: 600; color: var(--black); margin: 0.4rem 0 0.3rem; }
 .screen-sub { font-size: 14px; color: var(--muted); font-weight: 300; line-height: 1.7; max-width: 640px; margin-bottom: 1.2rem; }
-
+ 
 /* Connections */
 .conn-card { background: #fffdf9; border: 1px solid var(--border); border-radius: 14px; padding: 1.15rem 1.3rem; margin-bottom: 10px; }
 .conn-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 0.3rem; }
@@ -170,7 +172,7 @@ body {
 .conn-org { background: var(--c-blue-bg); border: 1px solid var(--c-blue-border); color: var(--c-blue-text); border-radius: 10px; padding: 0.65rem 0.9rem; font-size: 13px; margin: 0.6rem 0; line-height: 1.6; }
 .conn-actions { display: flex; gap: 8px; margin-top: 0.6rem; flex-wrap: wrap; }
 .cb-url { font-size: 12px; color: var(--muted); word-break: break-all; background: var(--cream2); border-radius: 8px; padding: 0.5rem 0.7rem; margin-top: 0.55rem; }
-
+ 
 /* Reconciliation */
 .recon-card { background: #fffdf9; border: 1px solid var(--border); border-radius: 14px; padding: 1.15rem 1.3rem; margin-bottom: 10px; }
 .recon-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -180,7 +182,7 @@ body {
 .recon-state { font-size: 12px; font-weight: 500; }
 .diag { background: var(--c-coral-bg); border: 1px solid var(--c-coral-border); border-radius: 10px; padding: 0.8rem 1rem; margin-top: 0.7rem; font-size: 13px; color: #6b2510; line-height: 1.7; }
 .diag ol { margin: 0.3rem 0 0 1.1rem; }
-
+ 
 /* Settings */
 .set-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 760px; }
 .set-cell { background: #fffdf9; border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; }
@@ -207,11 +209,11 @@ body {
 .btn-primary-dash { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 15px; font-weight: 500; font-family: 'DM Sans', sans-serif; color: var(--black); background: var(--accent); border: none; border-radius: 10px; cursor: pointer; }
 .section-sub { font-family: 'Khand', sans-serif; font-size: 16px; font-weight: 600; color: var(--black); margin: 1.8rem 0 0.5rem; }
 .manual-row { font-size: 13px; color: var(--muted); padding: 6px 0; border-bottom: 1px solid var(--border); }
-
+ 
 /* Footer */
 .dash-footer { margin-top: 2.4rem; padding-top: 1.3rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); font-weight: 300; }
 .dash-footer a { color: var(--muted); }
-
+ 
 .fade-in { animation: fadeUp 0.45s cubic-bezier(0.4,0,0.2,1) both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 640px) {
@@ -253,7 +255,7 @@ body {
 </div>
 <script>
 'use strict';
-
+ 
 /* ============================================================
    KIT CONFIG - filled by the kit when it was built.
    The defaults below are only for previewing the scaffold.
@@ -284,7 +286,7 @@ var KIT_CONFIG = {
   "feedbackUrl": ""
 };
 /*KIT_CONFIG_END*/
-
+ 
 /* ============================================================
    Settings (owner-editable in the Settings screen, never in code)
 ============================================================ */
@@ -302,7 +304,7 @@ var ACCENTS = [
   { key: 'purple', c: '#5C3DB0', dim: 'rgba(92,61,176,0.12)' },
   { key: 'green',  c: '#1A7A3C', dim: 'rgba(26,122,60,0.12)' }
 ];
-
+ 
 function defaultSettings() {
   return {
     venueName: 'Your venue',
@@ -327,7 +329,7 @@ function loadSettings() {
 }
 function saveSettings() { try { localStorage.setItem('vd_settings', JSON.stringify(SETTINGS)); } catch (e) {} }
 var SETTINGS = loadSettings();
-
+ 
 function loadJson(key, fallback) {
   try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
 }
@@ -339,7 +341,7 @@ function saveOrgOk() { try { localStorage.setItem('vd_orgok', JSON.stringify(ORG
 function saveManual() { try { localStorage.setItem('vd_manual', JSON.stringify(MANUAL)); } catch (e) {} }
 function isManual() { return SETTINGS.dataMode === 'manual'; }
 function rangeKey(from, to) { return iso(from) + '_' + iso(to); }
-
+ 
 /* ============================================================
    Metric catalogue - mirrors kpi-spec.md (locked definitions).
    Values are computed HERE from raw source data, in one place.
@@ -369,13 +371,13 @@ var METRIC_DEFS = {
                   decision: 'What the venue keeps after the costs you control. The bottom line of the board.' }
 };
 var CHOSEN = KIT_CONFIG.metrics.filter(function (k) { return METRIC_DEFS[k]; });
-
+ 
 var SOURCES = [
   { key: 'accounting', name: P.accounting, role: 'Money figures (' + KIT_CONFIG.taxLabel + ')' },
   { key: 'pos',        name: P.pos,        role: 'Transaction count' }
 ];
 if (P.rostering) SOURCES.push({ key: 'rostering', name: P.rostering, role: 'Projected wages (optional)' });
-
+ 
 /* ============================================================
    Dates and periods - venue timezone, week start, rollover.
    All maths on UTC-noon stamps so daylight saving never bites.
@@ -393,7 +395,7 @@ function addYears(s, n) { var x = new Date(s.getTime()); x.setUTCFullYear(x.getU
 function iso(s) { return s.toISOString().slice(0, 10); }
 function fromIso(str) { var p = str.split('-'); return stamp(+p[0], +p[1], +p[2]); }
 function monthKey(s) { return iso(s).slice(0, 7); }
-
+ 
 /* Today as a TRADING day: before the rollover hour, it is still yesterday. */
 function tradingToday() {
   var p = partsInTz(new Date(), SETTINGS.timezone);
@@ -412,7 +414,7 @@ function fyStart(forDate) {
   var thisYears = stamp(y, sm, 1);
   return (forDate.getTime() >= thisYears.getTime()) ? thisYears : stamp(y - 1, sm, 1);
 }
-
+ 
 var PERIODS = [
   { key: 'thisWeek',  label: 'This week' },
   { key: 'lastWeek',  label: 'Last week' },
@@ -422,7 +424,7 @@ var PERIODS = [
   { key: 'lastFY',    label: 'Last financial year' },
   { key: 'custom',    label: 'Custom…' }
 ];
-
+ 
 /* Returns { from, to, prev:{from,to}, yoy:{from,to}|null, label, prevLabel, yoyLabel } */
 function resolvePeriod(key, customFrom, customTo) {
   var today = tradingToday();
@@ -467,7 +469,7 @@ function resolvePeriod(key, customFrom, customTo) {
   }
   return { from: from, to: to, prev: prev, yoy: yoy, prevLabel: prevLabel, yoyLabel: yoyLabel };
 }
-
+ 
 function fmtRange(r) {
   function f(s) {
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -475,7 +477,7 @@ function fmtRange(r) {
   }
   return f(r.from) + ' to ' + f(r.to);
 }
-
+ 
 /* ============================================================
    App state + data fetch
 ============================================================ */
@@ -488,7 +490,7 @@ var state = {
   fetchedAt: null,
   fetchError: null
 };
-
+ 
 function apiUrl(force) {
   var r = resolvePeriod(state.period, state.customFrom, state.customTo);
   var trendEnd = tradingToday();
@@ -501,7 +503,7 @@ function apiUrl(force) {
         + '&rollover=' + (+SETTINGS.rolloverHour || 0);
   return '/api/metrics?' + q + (force ? '&refresh=1' : '');
 }
-
+ 
 /* ---------- Manual mode: build state.data from typed-in numbers ---------- */
 function manualEntry(rng) { return rng ? MANUAL[rangeKey(rng.from, rng.to)] : null; }
 function manualPeriod(entry) {
@@ -544,7 +546,7 @@ function buildManualData() {
     trend: buildManualTrend()
   };
 }
-
+ 
 function fetchData(force) {
   if (isManual()) {
     state.data = buildManualData();
@@ -568,7 +570,7 @@ function fetchData(force) {
     render();
   });
 }
-
+ 
 /* ============================================================
    Metric computation from raw source data (kpi-spec.md rules)
 ============================================================ */
@@ -578,7 +580,7 @@ function srcStatus(key) {
   return d.sources[key];
 }
 function isConfigured(key) { var s = srcStatus(key); return !!s.configured; }
-
+ 
 function periodValues(slot) {  /* slot: 'cur' | 'prev' | 'yoy' */
   var d = state.data;
   if (!d || !d.periods || !d.periods[slot]) return {};
@@ -598,7 +600,7 @@ function periodValues(slot) {  /* slot: 'cur' | 'prev' | 'yoy' */
   return out;
 }
 function num(v) { return (typeof v === 'number' && isFinite(v)) ? v : null; }
-
+ 
 /* Profit = Revenue − Cost of Sales − (wages+super) − Overheads, for the period.
    Needs all four; a missing component returns null (never a part-figure). */
 function profitDollars(vals) {
@@ -631,7 +633,7 @@ function fmtTarget(key, t) {
   if (METRIC_DEFS[key].fmt === 'int') return Math.round(t).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return fmtMoney(t, false);
 }
-
+ 
 /* metric value for a slot; null = no data; 'zero-count' handled by caller */
 function metricValue(key, vals) {
   if (key === 'revenue') return vals.revenue;
@@ -650,7 +652,7 @@ function metricValue(key, vals) {
   }
   return null;
 }
-
+ 
 function fmtMoney(v, cents) {
   var neg = v < 0; v = Math.abs(v);
   var s = cents ? v.toFixed(2) : Math.round(v).toString();
@@ -688,7 +690,7 @@ function compare(key, cur, base) {
   var good = dir === 'flat' ? null : (dir === METRIC_DEFS[key].goodDir);
   return { dir: dir, text: text, good: good };
 }
-
+ 
 /* Targets and alerts: the owner sets a target per metric in Settings; a card
    flags when its value sits on the wrong side of that target. */
 function metricTarget(key) {
@@ -701,7 +703,7 @@ function targetBreached(key, v) {
   if (t == null) return false;
   return METRIC_DEFS[key].goodDir === 'down' ? (v > t) : (v < t);
 }
-
+ 
 /* ============================================================
    Rendering
 ============================================================ */
@@ -717,7 +719,7 @@ function applyAccent() {
   document.documentElement.style.setProperty('--accent', a.c);
   document.documentElement.style.setProperty('--accent-dim', a.dim);
 }
-
+ 
 function unconfirmedConnectedMetrics() {
   return CHOSEN.filter(function (k) {
     var ready = METRIC_DEFS[k].needs.every(isConfigured);
@@ -734,20 +736,20 @@ function unconfirmedOrgs() {
     return st.configured && st.connected && !ORG_OK[s.key];
   });
 }
-
+ 
 function render() {
   applyAccent();
   var root = app();
   root.innerHTML = '';
   var _bt = document.getElementById('vd-bartip'); if (_bt) _bt.style.opacity = '0';
-
+ 
   /* Topbar */
   var top = el('div', 'topbar');
   top.appendChild(el('div', 'venue-name', esc(SETTINGS.venueName)));
   top.appendChild(el('div', 'topbar-sub', 'Your numbers · ' + esc(KIT_CONFIG.taxLabel) + ' · financial year ' + esc(KIT_CONFIG.fyLabel)));
   root.appendChild(top);
   root.appendChild(el('div', 'top-rule'));
-
+ 
   /* Nav */
   var nav = el('div', 'nav');
   var tabs = isManual()
@@ -760,7 +762,7 @@ function render() {
     nav.appendChild(b);
   });
   root.appendChild(nav);
-
+ 
   /* Banners */
   if (!isManual() && anyConfiguredSource() && unconfirmedOrgs().length) {
     var ub = el('div', 'banner banner-amber');
@@ -783,14 +785,14 @@ function render() {
     pwb.innerHTML = '<b>No password set yet.</b> Anyone with this link can see your numbers. Ask your AI to set a dashboard password.';
     root.appendChild(pwb);
   }
-
+ 
   if (isManual() && (state.view === 'connections' || state.view === 'recon')) state.view = 'dashboard';
   if (state.view === 'dashboard') renderDashboard(root);
   else if (state.view === 'enter') renderManualEntry(root);
   else if (state.view === 'connections') renderConnections(root);
   else if (state.view === 'recon') renderRecon(root);
   else renderSettings(root);
-
+ 
   /* Footer */
   var foot = el('div', 'dash-footer');
   var left = el('div', null, 'Kit built ' + esc(KIT_CONFIG.kitDate) + ' · every connection is read-only');
@@ -801,21 +803,21 @@ function render() {
     foot.appendChild(right);
   }
   root.appendChild(foot);
-
+ 
   var goR = document.getElementById('go-recon');
   if (goR) goR.onclick = function () { state.view = 'recon'; render(); };
   var goC = document.getElementById('go-conn');
   if (goC) goC.onclick = function () { state.view = 'connections'; render(); };
 }
-
+ 
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
+ 
 /* ---------- Dashboard view ---------- */
 function renderDashboard(root) {
   var r = resolvePeriod(state.period, state.customFrom, state.customTo);
-
+ 
   /* Period selector */
   var bar = el('div', 'period-bar');
   bar.appendChild(el('span', 'period-label', 'Period'));
@@ -828,7 +830,7 @@ function renderDashboard(root) {
     bar.appendChild(c);
   });
   root.appendChild(bar);
-
+ 
   if (state.period === 'custom') {
     var cw = el('div', 'custom-wrap');
     var f = document.createElement('input'); f.type = 'date'; f.id = 'cfrom'; if (state.customFrom) f.value = state.customFrom;
@@ -847,7 +849,7 @@ function renderDashboard(root) {
     root.appendChild(cw);
     if (!state.customFrom || !state.customTo) { root.appendChild(el('p', 'screen-sub', 'Pick a start and end date.')); return; }
   }
-
+ 
   /* Freshness (or, in manual mode, an edit prompt) */
   var fr = el('div', 'fresh-row');
   if (isManual()) {
@@ -867,9 +869,9 @@ function renderDashboard(root) {
     fr.appendChild(rb);
   }
   root.appendChild(fr);
-
+ 
   root.appendChild(el('div', 'period-heading', periodLabel() + ' <span>· ' + fmtRange(r) + '</span>'));
-
+ 
   if (isManual() && !manualEntry({ from: r.from, to: r.to })) {
     var mb = el('div', 'banner banner-amber');
     mb.innerHTML = '<b>No numbers entered for this period yet.</b> Add them and your dashboard fills in straight away.';
@@ -880,24 +882,24 @@ function renderDashboard(root) {
     mb.appendChild(mbtn);
     root.appendChild(mb);
   }
-
+ 
   /* Cards */
   var grid = el('div', 'cards');
   var cur = periodValues('cur'), prev = periodValues('prev'), yoy = periodValues('yoy');
   CHOSEN.forEach(function (k) { grid.appendChild(metricCard(k, cur, prev, yoy, r)); });
   root.appendChild(grid);
 }
-
+ 
 function periodLabel() {
   var p = PERIODS.filter(function (x) { return x.key === state.period; })[0];
   return p ? p.label.replace('…', '') : '';
 }
-
+ 
 function metricCard(key, cur, prev, yoy, r) {
   var def = METRIC_DEFS[key];
   var ready = def.needs.every(isConfigured);
   var card = el('div', 'mcard fade-in');
-
+ 
   if (!ready) {
     card.className += ' not-conf';
     card.appendChild(el('div', 'm-label', esc(def.label)));
@@ -908,7 +910,7 @@ function metricCard(key, cur, prev, yoy, r) {
     card.appendChild(el('div', 'm-def', esc(def.def)));
     return card;
   }
-
+ 
   if (state.data && state.data.manual) {
     if (manualEntry({ from: r.from, to: r.to })) card.appendChild(el('span', 'm-tag tag-manual', 'Entered by you'));
   } else if (RECON[key] === 'flagged') {
@@ -917,9 +919,9 @@ function metricCard(key, cur, prev, yoy, r) {
   } else if (RECON[key] !== 'confirmed') {
     card.appendChild(el('span', 'm-tag tag-unverified', 'Unverified'));
   }
-
+ 
   card.appendChild(el('div', 'm-label', esc(def.label)));
-
+ 
   var v = metricValue(key, cur);
   if (state.loading && state.data == null) {
     card.appendChild(el('div', 'm-value dim', '…'));
@@ -932,13 +934,23 @@ function metricCard(key, cur, prev, yoy, r) {
       ps.innerHTML = '<span class="m-tag tag-proj" style="margin:0 6px 0 0">Projected</span>' + pj + '% from ' + esc(P.rostering) + ' roster';
       card.appendChild(ps);
     }
-
+    /* Owner-requested: wages for this trading week (Mon-Sun) are paid the
+       following Monday - show that pay date on the Wage % card in the two
+       week-based views only (a month/FY view has no single pay date). */
+    if (key === 'wage' && (state.period === 'thisWeek' || state.period === 'lastWeek')) {
+      var payDate = addDays(r.from, 7);
+      var payMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      var payDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      var payStr = payDays[payDate.getUTCDay()] + ', ' + payDate.getUTCDate() + ' ' + payMonths[payDate.getUTCMonth()];
+      card.appendChild(el('div', 'm-sub', 'Wages for this week paid ' + payStr));
+    }
+ 
     /* Meter: target for most metrics, recent-average benchmark for revenue */
     var pf = primaryFigure(key, cur);
     if (targetBreached(key, pf)) card.className += ' alert';
     var meter = def.benchmark ? revenueBenchmark(cur) : targetMeter(key, pf);
     if (meter) card.appendChild(meter);
-
+ 
     /* Comparisons */
     var cmp1 = compare(key, v, metricValue(key, prev));
     var row1 = el('div', 'cmp-row');
@@ -954,7 +966,7 @@ function metricCard(key, cur, prev, yoy, r) {
     }
     card.appendChild(trendBars(key, r));
   }
-
+ 
   card.appendChild(el('div', 'm-def', esc(def.def)));
   if (def.decision) {
     var dec = el('div', 'm-decision');
@@ -964,7 +976,7 @@ function metricCard(key, cur, prev, yoy, r) {
   }
   return card;
 }
-
+ 
 function sourceName(key) {
   var s = SOURCES.filter(function (x) { return x.key === key; })[0];
   return s ? s.name : key;
@@ -976,7 +988,7 @@ function cmpVal(cmp) {
   n.textContent = (cmp.dir === 'up' ? '▲ ' : cmp.dir === 'down' ? '▼ ' : '● ') + cmp.text;
   return n;
 }
-
+ 
 /* Trend per metric, in the card's PRIMARY unit: % of revenue for dual metrics,
    the value otherwise. One value per month, null where data is missing. */
 function trendSeries(key) {
@@ -1025,7 +1037,7 @@ function headline(key, vals, v) {
   }
   return wrap;
 }
-
+ 
 /* Target meter: fill to the value, a marker at the target, coloured by whether
    the value is on the good side. Null when no target is set. */
 function targetMeter(key, pf) {
@@ -1048,7 +1060,7 @@ function targetMeter(key, pf) {
   wrap.appendChild(cap);
   return wrap;
 }
-
+ 
 /* Revenue benchmark: this period vs the trailing monthly average. Shown only for
    single-month periods, where the monthly history is a like-for-like comparison. */
 function revenueBenchmark(cur) {
@@ -1078,7 +1090,7 @@ function revenueBenchmark(cur) {
   wrap.appendChild(cap);
   return wrap;
 }
-
+ 
 /* 12-month history as bars, in the card's primary unit. Bars colour good/bad
    against the target where set (accent otherwise); the viewed month is outlined;
    hover shows the month and value. Zero-baselined so a high cost reads as a tall bar. */
@@ -1103,7 +1115,7 @@ function attachBarTip(holder) {
   });
   holder.addEventListener('mouseleave', function () { barTipEl().style.opacity = '0'; });
 }
-
+ 
 /* 12-month history as bars, built as real namespaced SVG nodes (not via innerHTML)
    with explicit inline sizing, so the chart can't collapse or balloon to the
    browser default. Bars colour good/bad vs target; the viewed month is outlined;
@@ -1161,12 +1173,12 @@ function trendLabel(key, v) {
   if (METRIC_DEFS[key].fmt === 'int') return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return fmtMoney(v, false);
 }
-
+ 
 /* ---------- Connections view ---------- */
 function renderConnections(root) {
   root.appendChild(el('div', 'screen-title', 'Connections'));
   root.appendChild(el('p', 'screen-sub', 'Each of your tools connects here, read-only: the dashboard can look at the numbers, it can never change anything in your till or your books.'));
-
+ 
   SOURCES.forEach(function (s) {
     var st = srcStatus(s.key);
     var card = el('div', 'conn-card fade-in');
@@ -1178,14 +1190,14 @@ function renderConnections(root) {
     else head.appendChild(el('span', 'conn-pill pill-off', 'Set up, not linked yet'));
     card.appendChild(head);
     card.appendChild(el('div', 'conn-line', esc(s.role) + (st.lastSync ? ' · last synced ' + esc(st.lastSync) : '')));
-
+ 
     if (st.sandbox) {
       var sb = el('div', 'banner banner-coral');
       sb.style.margin = '0.6rem 0 0';
       sb.innerHTML = '<b>This looks like a test environment.</b> The data here may be fake. Your AI will switch the connection to the live one before any number is trusted.';
       card.appendChild(sb);
     }
-
+ 
     if (st.configured && st.connected && st.org) {
       var ob = el('div', 'conn-org');
       if (ORG_OK[s.key]) {
@@ -1200,7 +1212,7 @@ function renderConnections(root) {
       }
       card.appendChild(ob);
     }
-
+ 
     if (st.error && st.error.plain) {
       var eb = el('div', 'conn-line');
       eb.style.color = '#6b2510';
@@ -1208,7 +1220,7 @@ function renderConnections(root) {
       eb.textContent = st.error.plain;
       card.appendChild(eb);
     }
-
+ 
     var act = el('div', 'conn-actions');
     if (st.configured) {
       var rec = el('button', 'btn-plain', st.connected ? 'Reconnect' : 'Connect');
@@ -1218,17 +1230,17 @@ function renderConnections(root) {
       act.appendChild(el('span', 'conn-line', 'Your AI sets this up with you during the build.'));
     }
     card.appendChild(act);
-
+ 
     var cb = el('div', 'cb-url');
     cb.innerHTML = 'Callback address for this connection (your AI may ask for it): <b>' + esc(location.origin + '/auth/' + s.key + '/callback') + '</b>';
     card.appendChild(cb);
-
+ 
     if (st.ingest) card.appendChild(uploadPanel(s));
-
+ 
     root.appendChild(card);
   });
 }
-
+ 
 /* ---------- File upload (the guided-upload rung) ---------- */
 function uploadPanel(s) {
   var wrap = el('div', 'conn-org');
@@ -1237,14 +1249,14 @@ function uploadPanel(s) {
   wrap.style.color = 'var(--c-purple-text)';
   wrap.innerHTML = '<b>Add data from a file.</b> Export the usual report from '
     + esc(s.name) + ' (or use the one it emails you), then drop it here. Your AI told you the upload code the first time.';
-
+ 
   var row = el('div', 'conn-actions');
   var file = document.createElement('input');
   file.type = 'file';
   file.accept = '.csv,.txt,.json,.tsv';
   file.style.fontSize = '12px';
   row.appendChild(file);
-
+ 
   var code = null;
   try { code = localStorage.getItem('vd_upcode'); } catch (e) {}
   var codeInput = null;
@@ -1255,7 +1267,7 @@ function uploadPanel(s) {
     codeInput.style.cssText = 'font-family:DM Sans,sans-serif;font-size:13px;padding:7px 10px;border:1px solid var(--border-med);border-radius:8px;';
     row.appendChild(codeInput);
   }
-
+ 
   var btn = el('button', 'btn-small', 'Upload');
   var msg = el('div', 'conn-line');
   msg.style.marginTop = '0.4rem';
@@ -1292,7 +1304,7 @@ function uploadPanel(s) {
   wrap.appendChild(msg);
   return wrap;
 }
-
+ 
 /* ---------- Check your numbers (reconciliation) ---------- */
 function renderRecon(root) {
   root.appendChild(el('div', 'screen-title', 'Check your numbers'));
@@ -1301,13 +1313,13 @@ function renderRecon(root) {
     + esc(P.accounting) + ' profit and loss for the money figures, and ' + esc(P.pos)
     + ' for the transaction count. Money figures come straight from ' + esc(P.accounting)
     + ', so they should match to the cent. Any gap is a build problem for your AI to fix, not something to shrug at.'));
-
+ 
   var r = resolvePeriod(state.period, state.customFrom, state.customTo);
   root.appendChild(el('p', 'screen-sub', 'Checking period: <b>' + fmtRange(r) + '</b> (change it with the period buttons on the Dashboard).'));
-
+ 
   var cur = periodValues('cur');
   var anyReady = false;
-
+ 
   CHOSEN.forEach(function (k) {
     var def = METRIC_DEFS[k];
     if (!def.needs.every(isConfigured)) return;
@@ -1317,7 +1329,7 @@ function renderRecon(root) {
     head.appendChild(el('span', 'recon-metric', esc(def.label)));
     head.appendChild(el('span', 'recon-fig', fmtValue(k, metricValue(k, cur))));
     card.appendChild(head);
-
+ 
     var inst;
     if (k === 'transactions') {
       inst = 'Open ' + P.pos + ' reporting for exactly these dates. Does the number of completed transactions match the figure above?';
@@ -1329,13 +1341,13 @@ function renderRecon(root) {
       inst = 'Open ' + P.accounting + ' and run your profit and loss for exactly these dates. Does ' + def.label + ' there match the figure above, to the cent?';
     }
     card.appendChild(el('div', 'recon-inst', esc(inst)));
-
+ 
     var stateLine = el('div', 'recon-state');
     if (RECON[k] === 'confirmed') { stateLine.innerHTML = '<span class="up">✓ Confirmed against your records</span>'; }
     else if (RECON[k] === 'flagged') { stateLine.innerHTML = '<span class="down">Marked as needing a check</span>'; }
     else { stateLine.innerHTML = '<span class="flat">Not checked yet</span>'; }
     card.appendChild(stateLine);
-
+ 
     var act = el('div', 'conn-actions');
     var yes = el('button', 'btn-small', 'It matches');
     yes.onclick = function () { RECON[k] = 'confirmed'; saveRecon(); render(); };
@@ -1343,7 +1355,7 @@ function renderRecon(root) {
     no.onclick = function () { RECON[k] = 'flagged'; saveRecon(); render(); };
     act.appendChild(yes); act.appendChild(no);
     card.appendChild(act);
-
+ 
     if (RECON[k] === 'flagged') {
       var dg = el('div', 'diag');
       dg.innerHTML = '<b>Tell your AI it doesn’t match.</b> It will work through the usual culprits, in order:'
@@ -1358,12 +1370,12 @@ function renderRecon(root) {
     }
     root.appendChild(card);
   });
-
+ 
   if (!anyReady) {
     root.appendChild(el('p', 'screen-sub', 'Nothing to check yet: no data source is connected. As each tool connects, its numbers appear here for you to verify.'));
   }
 }
-
+ 
 /* ---------- Settings ---------- */
 var TAX_WORD = (KIT_CONFIG.taxLabel || 'ex-GST').replace('ex-', '');
 var MANUAL_FIELDS = [
@@ -1389,11 +1401,11 @@ function manualNeededFieldKeys() {
   if (KIT_CONFIG.providers.rostering && CHOSEN.indexOf('wage') >= 0) keys.push('rosteredCost');
   return keys;
 }
-
+ 
 function renderManualEntry(root) {
   root.appendChild(el('div', 'screen-title', 'Enter your numbers'));
   root.appendChild(el('p', 'screen-sub', 'Type the figures from your own profit and loss and POS report. No accounts to connect and no code. Your dashboard fills in the moment you save, and it takes a couple of minutes each week.'));
-
+ 
   var ep = state.enterPeriod || (state.period === 'custom' ? 'lastWeek' : state.period);
   state.enterPeriod = ep;
   var pbar = el('div', 'period-bar');
@@ -1405,10 +1417,10 @@ function renderManualEntry(root) {
     pbar.appendChild(c);
   });
   root.appendChild(pbar);
-
+ 
   var r = resolvePeriod(ep);
   root.appendChild(el('p', 'manual-dates', 'You are entering numbers for ' + fmtRange(r) + '.'));
-
+ 
   var existing = manualEntry({ from: r.from, to: r.to });
   var vals = (existing && existing.values) ? existing.values : {};
   var fields = manualNeededFieldKeys();
@@ -1427,7 +1439,7 @@ function renderManualEntry(root) {
     grid.appendChild(cell);
   });
   root.appendChild(grid);
-
+ 
   var att = el('div', 'manual-attest');
   var cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'attest';
   if (existing && existing.attested) cb.checked = true;
@@ -1435,10 +1447,10 @@ function renderManualEntry(root) {
   lab.textContent = 'These figures are from my own profit and loss and POS report for these dates.';
   att.appendChild(cb); att.appendChild(lab);
   root.appendChild(att);
-
+ 
   var errLine = el('div', 'err-line'); errLine.style.display = 'none';
   root.appendChild(errLine);
-
+ 
   var saveBtn = el('button', 'btn-primary-dash', 'Save these numbers');
   saveBtn.onclick = function () {
     if (!cb.checked) { errLine.textContent = 'Please tick the box to confirm these are your own figures.'; errLine.style.display = 'block'; return; }
@@ -1456,7 +1468,7 @@ function renderManualEntry(root) {
   };
   root.appendChild(saveBtn);
   root.appendChild(el('p', 'set-note', 'After you save, open the Dashboard tab to see these numbers, how they compare to the period before, and where they need your attention.'));
-
+ 
   var keys = Object.keys(MANUAL).sort().reverse();
   if (keys.length) {
     root.appendChild(el('div', 'section-sub', 'Saved so far'));
@@ -1466,11 +1478,11 @@ function renderManualEntry(root) {
     });
   }
 }
-
+ 
 function renderSettings(root) {
   root.appendChild(el('div', 'screen-title', 'Settings'));
   root.appendChild(el('p', 'screen-sub', 'The bits you might want to change, with no code anywhere. Your AI set the rest up during the build.'));
-
+ 
   root.appendChild(el('div', 'set-label', 'Where your numbers come from'));
   var modeWrap = el('div', 'mode-wrap');
   [ { k: 'manual', t: 'I type them in', d: 'Enter the numbers from your profit and loss and POS report each week. Works straight away, with nothing to connect.' },
@@ -1483,16 +1495,16 @@ function renderSettings(root) {
     modeWrap.appendChild(mc);
   });
   root.appendChild(modeWrap);
-
+ 
   var grid = el('div', 'set-grid');
-
+ 
   var c1 = el('div', 'set-cell');
   c1.appendChild(el('div', 'set-label', 'Venue name'));
   var vn = document.createElement('input'); vn.type = 'text'; vn.value = SETTINGS.venueName; vn.maxLength = 60;
   vn.onchange = function () { SETTINGS.venueName = vn.value || 'Your venue'; saveSettings(); render(); };
   c1.appendChild(vn);
   grid.appendChild(c1);
-
+ 
   var c2 = el('div', 'set-cell');
   c2.appendChild(el('div', 'set-label', 'Default period'));
   var sel = document.createElement('select');
@@ -1506,7 +1518,7 @@ function renderSettings(root) {
   c2.appendChild(sel);
   c2.appendChild(el('div', 'set-note', 'What the dashboard opens on.'));
   grid.appendChild(c2);
-
+ 
   var c3 = el('div', 'set-cell');
   c3.appendChild(el('div', 'set-label', 'Week starts on'));
   var ws = document.createElement('select');
@@ -1519,7 +1531,7 @@ function renderSettings(root) {
   ws.onchange = function () { SETTINGS.weekStart = +ws.value; saveSettings(); fetchData(); };
   c3.appendChild(ws);
   grid.appendChild(c3);
-
+ 
   var c4 = el('div', 'set-cell');
   c4.appendChild(el('div', 'set-label', 'Trading day rolls over at'));
   var ro = document.createElement('select');
@@ -1533,7 +1545,7 @@ function renderSettings(root) {
   c4.appendChild(ro);
   c4.appendChild(el('div', 'set-note', 'If you trade past midnight, sales before this hour count to the previous day.'));
   grid.appendChild(c4);
-
+ 
   var c5 = el('div', 'set-cell');
   c5.appendChild(el('div', 'set-label', 'Timezone'));
   var tzSel = document.createElement('select');
@@ -1545,7 +1557,7 @@ function renderSettings(root) {
   tzSel.onchange = function () { SETTINGS.timezone = tzSel.value; saveSettings(); fetchData(); };
   c5.appendChild(tzSel);
   grid.appendChild(c5);
-
+ 
   var c6 = el('div', 'set-cell');
   c6.appendChild(el('div', 'set-label', 'Accent colour'));
   var sw = el('div', 'swatches');
@@ -1558,9 +1570,9 @@ function renderSettings(root) {
   });
   c6.appendChild(sw);
   grid.appendChild(c6);
-
+ 
   root.appendChild(grid);
-
+ 
   /* Targets and alerts (Monday-review thresholds) */
   root.appendChild(el('div', 'screen-title', 'Targets and alerts'));
   root.appendChild(el('p', 'screen-sub', 'Set the level you want each number to stay on the right side of. Cost and profit targets are a share of revenue (30 means 30% of revenue); transaction and spend targets are a plain number. A card flags amber when it slips to the wrong side. Revenue is shown against its own recent average instead of a fixed target.'));
@@ -1585,7 +1597,7 @@ function renderSettings(root) {
     tgrid.appendChild(cell);
   });
   root.appendChild(tgrid);
-
+ 
   if (!isManual()) {
     root.appendChild(el('div', 'section-sub', 'Session'));
     var logoutBtn = el('button', 'btn-plain', 'Log out');
@@ -1593,7 +1605,7 @@ function renderSettings(root) {
     root.appendChild(logoutBtn);
   }
 }
-
+ 
 /* ============================================================
    Boot
 ============================================================ */
@@ -1604,3 +1616,5 @@ fetchData();
 </body>
 </html>
 <!-- EOF dashboard.html -->
+ 
+
